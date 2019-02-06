@@ -48,7 +48,7 @@ export class Promise{
             this._status = PromiseStatus.REJECTED;
             this._value = reason;
 
-            this._onFulfilledActions.forEach((action: Function)=>{
+            this._onFailedActions.forEach((action: Function)=>{
                 action(this._value);
             });
         }
