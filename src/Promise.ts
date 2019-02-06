@@ -59,7 +59,7 @@ export class Promise{
     then(onFulfilled?: FulfilledAction, onRejected?:FailedAction): Promise{
         const promise = new Promise();
 
-        const wrappedAction = (result)=>{
+        const wrappedFulfilledAction = (result)=>{
             try{
                 let output;
                 if(onFulfilled) {
@@ -74,30 +74,33 @@ export class Promise{
         };
         switch(this.status){
             case PromiseStatus.PENDING:
-                this._onFulfilledActions.push(wrappedAction);
+                this._onFulfilledActions.push(wrappedFulfilledAction);
                 break;
             case PromiseStatus.RESOLVED:
-                wrappedAction(this.value);
+                wrappedFulfilledAction(this.value);
                 break;
         }
 
-        if(onRejected){
-            const wrappedAction = (reason)=>{
-                try{
-                    const output =  onRejected(reason);
-                    promise._reject(output);
-                }catch(e){
-                    promise._reject(e);
+        const wrappedFailedAction = (reason)=>{
+            try{
+                let output;
+                if(onRejected){
+                    output =  onRejected(reason);
+                }else {
+                    output = reason;
                 }
-            };
-            switch(this._status){
-                case PromiseStatus.PENDING:
-                    this._onFailedActions.push(wrappedAction);
-                    break;
-                case PromiseStatus.REJECTED:
-                    wrappedAction(this.value);
-                    break;
+                promise._reject(output);
+            }catch(e){
+                promise._reject(e);
             }
+        };
+        switch(this._status){
+            case PromiseStatus.PENDING:
+                this._onFailedActions.push(wrappedFailedAction);
+                break;
+            case PromiseStatus.REJECTED:
+                wrappedFailedAction(this.value);
+                break;
         }
 
         return promise;

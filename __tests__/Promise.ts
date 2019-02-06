@@ -131,4 +131,18 @@ describe("The Then Method", ()=>{
             expect(tmpResult).toBe(1);
         });
     });
+
+    it("If onRejected is not a function and promise1 is rejected, promise2 must be rejected with the same reason as promise1.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            reject(1);
+        }).then()
+            .then(undefined, (reason)=>{
+                tmpReason = reason;
+            });
+
+        process.nextTick(()=>{
+            expect(tmpReason).toBe(1);
+        });
+    });
 });
