@@ -37,6 +37,7 @@ export class Promise{
             this._status = PromiseStatus.RESOLVED;
             this._value = result;
 
+            // onFulfilled and onRejected must be called as functions (i.e. with no this value).
             this._onFulfilledActions.forEach((action: Function)=>{
                 action(this._value);
             });
@@ -48,6 +49,7 @@ export class Promise{
             this._status = PromiseStatus.REJECTED;
             this._value = reason;
 
+            // onFulfilled and onRejected must be called as functions (i.e. with no this value).
             this._onFailedActions.forEach((action: Function)=>{
                 action(this._value);
             });
@@ -77,6 +79,7 @@ export class Promise{
                 this._onFulfilledActions.push(wrappedFulfilledAction);
                 break;
             case PromiseStatus.RESOLVED:
+                // onFulfilled and onRejected must be called as functions (i.e. with no this value).
                 wrappedFulfilledAction(this.value);
                 break;
         }
@@ -99,6 +102,7 @@ export class Promise{
                 this._onFailedActions.push(wrappedFailedAction);
                 break;
             case PromiseStatus.REJECTED:
+                // onFulfilled and onRejected must be called as functions (i.e. with no this value).
                 wrappedFailedAction(this.value);
                 break;
         }
