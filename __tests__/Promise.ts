@@ -186,6 +186,25 @@ describe("The Then Method", ()=>{
         })
     });
 
+    // throw async error in executor can't be caught ?
+    /*
+    it("[Async] If executor throws an exception e, next promise must be rejected with e as the reason.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                throw new Error("GG");
+            });
+        }).then(undefined, (reason)=>{
+            tmpReason = reason;
+        });
+
+        // because try catch, the assert of jest will be blocked, so I check result at next tick
+        process.nextTick(()=>{
+            expect(tmpReason.toString()).toBe("Error: GG");
+        })
+    });
+    */
+
     // 2.2.7.2
     it("If onFulfilled throws an exception e, next promise must be rejected with e as the reason.", ()=>{
         let tmpReason;
