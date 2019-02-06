@@ -78,6 +78,45 @@ describe("The Then Method", ()=>{
         expect(promise1 === promise2).toBe(false);
     });
 
+    // 2.2.6 then may be called multiple times on the same promise.
+    // 2.2.6.1
+    it("If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their originating calls to then", ()=>{
+        let executedOrder = "";
+        const promise1 = new Promise((resolve, reject)=>{
+            resolve(1);
+        });
+        const helpFunc = (order: string)=>{
+           return (result)=>{
+            executedOrder += (order + result);
+           }
+        };
+        promise1.then(helpFunc("A"));
+        promise1.then(helpFunc("B"));
+        promise1.then(helpFunc("C"));
+
+        // also check if the result pass to then method
+        expect(executedOrder).toBe("A1B1C1");
+    });
+
+    // 2.2.6.2
+    it("If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.", ()=>{
+        let executedOrder = "";
+        const promise1 = new Promise((resolve, reject)=>{
+            reject(1);
+        });
+        const helpFunc = (order: string)=>{
+            return (reason)=>{
+                executedOrder += (order + reason);
+            }
+        };
+        promise1.then(undefined, helpFunc("A"));
+        promise1.then(undefined, helpFunc("B"));
+        promise1.then(undefined, helpFunc("C"));
+
+        // also check if the result pass to then method
+        expect(executedOrder).toBe("A1B1C1");
+    });
+
     // 2.2.7
     it("then must return a new promise", ()=>{
         const promise1 = new Promise((resolve, reject)=>{
