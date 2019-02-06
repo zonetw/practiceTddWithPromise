@@ -78,6 +78,7 @@ describe("The Then Method", ()=>{
         expect(promise1 === promise2).toBe(false);
     });
 
+    // 2.2.7
     it("then must return a new promise", ()=>{
         const promise1 = new Promise((resolve, reject)=>{
             resolve(1);
@@ -102,6 +103,7 @@ describe("The Then Method", ()=>{
         })
     });
 
+    // 2.2.7.2
     it("If onFulfilled throws an exception e, next promise must be rejected with e as the reason.", ()=>{
         let tmpReason;
         const promise1 = new Promise((resolve, reject)=>{
@@ -118,6 +120,23 @@ describe("The Then Method", ()=>{
         })
     });
 
+    it("If onFailed throws an exception e, next promise must be rejected with e as the reason.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            reject();
+        }).then(undefined, (reason)=>{
+            throw new Error("GG");
+        }).then(undefined, (reason)=>{
+            tmpReason = reason;
+        });
+
+        // because try catch, the assert of jest will be blocked, so I check result at next tick
+        process.nextTick(()=>{
+            expect(tmpReason.toString()).toBe("Error: GG");
+        })
+    });
+
+    // 2.2.7.3
     it("If onFulfilled is not a function and promise1 is fulfilled, promise2 must be fulfilled with the same value as promise1", ()=>{
         let tmpResult;
         const promise1 = new Promise((resolve, reject)=>{
@@ -132,6 +151,7 @@ describe("The Then Method", ()=>{
         });
     });
 
+    // 2.2.7.4
     it("If onRejected is not a function and promise1 is rejected, promise2 must be rejected with the same reason as promise1.", ()=>{
         let tmpReason;
         const promise1 = new Promise((resolve, reject)=>{
