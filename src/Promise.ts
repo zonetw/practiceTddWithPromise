@@ -24,7 +24,11 @@ export class Promise{
         this._reject = this._reject.bind(this);
 
         if(executor){
-            executor(this._resolve, this._reject);
+            try{
+                executor(this._resolve, this._reject);
+            }catch(e){
+                this._reject(e);
+            }
         }
     }
 

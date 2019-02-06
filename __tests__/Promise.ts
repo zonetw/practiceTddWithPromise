@@ -7,6 +7,63 @@ describe("1. Basic Test", ()=>{
         });
         expect(promise.status).toEqual(PromiseStatus.PENDING);
     });
+
+    // it("Catch the error occur when executing the executor function ( sync )", ()=>{
+    //     let promise = new Promise((resolve, reject)=>{
+    //         throw new Error("Error on purpose");
+    //     }).catch((reason)=>{
+    //         expect(reason.toString()).toEqual("Error: Error on purpose");
+    //     });
+    // });
+    //
+    // it("Promise is an object or function with a then method whose behavior conforms to this specification", ()=>{
+    //     let promise = new Promise((resolve, reject)=>{});
+    //     expect(typeof promise.then).toEqual("function");
+    // });
+    //
+    // it("Promise will call resolve function when fulfilled, and change status to resolved", (done)=>{
+    //     let promise = new Promise((resolve, reject)=>{
+    //         process.nextTick(()=>{
+    //             resolve();
+    //             expect(promise.status).toEqual(PromiseStatus.RESOLVED);
+    //             done();
+    //         });
+    //     });
+    //     expect(promise.status).toEqual(PromiseStatus.PENDING);
+    // });
+    //
+    // it("Promise will call reject function when failed, and change status to rejected", (done)=>{
+    //     let promise = new Promise((resolve, reject)=>{
+    //         process.nextTick(()=>{
+    //             reject();
+    //             expect(promise.status).toEqual(PromiseStatus.REJECTED);
+    //             done();
+    //         });
+    //     });
+    //     expect(promise.status).toEqual(PromiseStatus.PENDING);
+    // });
+    //
+    // it("Promise will not change status after complete(reject)", (done)=>{
+    //     let promise = new Promise((resolve, reject)=>{
+    //         process.nextTick(()=>{
+    //             reject();
+    //             resolve();
+    //             expect(promise.status).toEqual(PromiseStatus.REJECTED);
+    //             done();
+    //         });
+    //     });
+    // });
+    //
+    // it("Promise will not change status after complete(resolve)", (done)=>{
+    //     let promise = new Promise((resolve, reject)=>{
+    //         process.nextTick(()=>{
+    //             resolve();
+    //             reject();
+    //             expect(promise.status).toEqual(PromiseStatus.RESOLVED);
+    //             done();
+    //         });
+    //     });
+    // });
 });
 
 describe("The Then Method", ()=>{
@@ -29,6 +86,20 @@ describe("The Then Method", ()=>{
             expect(result).toBe(1);
         });
         expect(promise1 === promise2).toBe(false);
+    });
+
+    it("If executor throws an exception e, next promise must be rejected with e as the reason.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            throw new Error("GG");
+        }).then(undefined, (reason)=>{
+            tmpReason = reason;
+        });
+
+        // because try catch, the assert of jest will be blocked, so I check result at next tick
+        process.nextTick(()=>{
+            expect(tmpReason.toString()).toBe("Error: GG");
+        })
     });
 
     it("If onFulfilled throws an exception e, next promise must be rejected with e as the reason.", ()=>{
