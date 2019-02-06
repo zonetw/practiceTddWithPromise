@@ -98,6 +98,28 @@ describe("The Then Method", ()=>{
         expect(executedOrder).toBe("A1B1C1");
     });
 
+    it("[Async] If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their originating calls to then", ()=>{
+        let executedOrder = "";
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                resolve(1);
+            });
+        });
+        const helpFunc = (order: string)=>{
+            return (result)=>{
+                executedOrder += (order + result);
+            }
+        };
+        promise1.then(helpFunc("A"));
+        promise1.then(helpFunc("B"));
+        promise1.then(helpFunc("C"));
+
+        // also check if the result pass to then method
+        process.nextTick(()=>{
+            expect(executedOrder).toBe("A1B1C1");
+        });
+    });
+
     // 2.2.6.2
     it("If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.", ()=>{
         let executedOrder = "";
@@ -115,6 +137,28 @@ describe("The Then Method", ()=>{
 
         // also check if the result pass to then method
         expect(executedOrder).toBe("A1B1C1");
+    });
+
+    it("[Async] If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.", ()=>{
+        let executedOrder = "";
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                reject(1);
+            });
+        });
+        const helpFunc = (order: string)=>{
+            return (reason)=>{
+                executedOrder += (order + reason);
+            }
+        };
+        promise1.then(undefined, helpFunc("A"));
+        promise1.then(undefined, helpFunc("B"));
+        promise1.then(undefined, helpFunc("C"));
+
+        // also check if the result pass to then method
+        process.nextTick(()=>{
+            expect(executedOrder).toBe("A1B1C1");
+        });
     });
 
     // 2.2.7
@@ -158,11 +202,45 @@ describe("The Then Method", ()=>{
             expect(tmpReason.toString()).toBe("Error: GG");
         })
     });
+    it("[Async] If onFulfilled throws an exception e, next promise must be rejected with e as the reason.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                resolve();
+            });
+        }).then((result)=>{
+            throw new Error("GG");
+        }).then(undefined, (reason)=>{
+            tmpReason = reason;
+        });
+
+        // because try catch, the assert of jest will be blocked, so I check result at next tick
+        process.nextTick(()=>{
+            expect(tmpReason.toString()).toBe("Error: GG");
+        })
+    });
 
     it("If onFailed throws an exception e, next promise must be rejected with e as the reason.", ()=>{
         let tmpReason;
         const promise1 = new Promise((resolve, reject)=>{
             reject();
+        }).then(undefined, (reason)=>{
+            throw new Error("GG");
+        }).then(undefined, (reason)=>{
+            tmpReason = reason;
+        });
+
+        // because try catch, the assert of jest will be blocked, so I check result at next tick
+        process.nextTick(()=>{
+            expect(tmpReason.toString()).toBe("Error: GG");
+        })
+    });
+    it("[Async] If onFailed throws an exception e, next promise must be rejected with e as the reason.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                reject();
+            });
         }).then(undefined, (reason)=>{
             throw new Error("GG");
         }).then(undefined, (reason)=>{
@@ -189,12 +267,42 @@ describe("The Then Method", ()=>{
             expect(tmpResult).toBe(1);
         });
     });
+    it("[Async] If onFulfilled is not a function and promise1 is fulfilled, promise2 must be fulfilled with the same value as promise1", ()=>{
+        let tmpResult;
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                resolve(1);
+            });
+        }).then()
+            .then((result)=>{
+                tmpResult = result;
+            });
+
+        process.nextTick(()=>{
+            expect(tmpResult).toBe(1);
+        });
+    });
 
     // 2.2.7.4
     it("If onRejected is not a function and promise1 is rejected, promise2 must be rejected with the same reason as promise1.", ()=>{
         let tmpReason;
         const promise1 = new Promise((resolve, reject)=>{
             reject(1);
+        }).then()
+            .then(undefined, (reason)=>{
+                tmpReason = reason;
+            });
+
+        process.nextTick(()=>{
+            expect(tmpReason).toBe(1);
+        });
+    });
+    it("[Async] If onRejected is not a function and promise1 is rejected, promise2 must be rejected with the same reason as promise1.", ()=>{
+        let tmpReason;
+        const promise1 = new Promise((resolve, reject)=>{
+            process.nextTick(()=>{
+                reject(1);
+            });
         }).then()
             .then(undefined, (reason)=>{
                 tmpReason = reason;
