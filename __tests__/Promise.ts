@@ -117,4 +117,18 @@ describe("The Then Method", ()=>{
             expect(tmpReason.toString()).toBe("Error: GG");
         })
     });
+
+    it("If onFulfilled is not a function and promise1 is fulfilled, promise2 must be fulfilled with the same value as promise1", ()=>{
+        let tmpResult;
+        const promise1 = new Promise((resolve, reject)=>{
+            resolve(1);
+        }).then()
+            .then((result)=>{
+                tmpResult = result;
+            });
+
+        process.nextTick(()=>{
+            expect(tmpResult).toBe(1);
+        });
+    });
 });

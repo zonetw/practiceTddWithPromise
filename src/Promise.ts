@@ -59,23 +59,26 @@ export class Promise{
     then(onFulfilled?: FulfilledAction, onRejected?:FailedAction): Promise{
         const promise = new Promise();
 
-        if(onFulfilled){
-            const wrappedAction = (result)=>{
-                try{
-                    const output = onFulfilled(result);
-                    promise._resolve(output);
-                }catch(e){
-                    promise._reject(e);
+        const wrappedAction = (result)=>{
+            try{
+                let output;
+                if(onFulfilled) {
+                    output = onFulfilled(result);
+                }else{
+                    output = result;
                 }
-            };
-            switch(this.status){
-                case PromiseStatus.PENDING:
-                    this._onFulfilledActions.push(wrappedAction);
-                    break;
-                case PromiseStatus.RESOLVED:
-                    wrappedAction(this.value);
-                    break;
+                promise._resolve(output);
+            }catch(e){
+                promise._reject(e);
             }
+        };
+        switch(this.status){
+            case PromiseStatus.PENDING:
+                this._onFulfilledActions.push(wrappedAction);
+                break;
+            case PromiseStatus.RESOLVED:
+                wrappedAction(this.value);
+                break;
         }
 
         if(onRejected){
