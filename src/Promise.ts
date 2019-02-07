@@ -4,18 +4,26 @@ type FulfilledAction = (result?)=>any;
 type FailedAction = (reason?)=>any;
 
 export class Promise{
-    get value(): any {
-        return this._value;
-    }
     get status(): PromiseStatus {
         return this._status;
     }
+    get value(): any {
+        return this._value;
+    }
+    get id(): number {
+        return this._id;
+    }
+    private static _promiseArr: Promise[] = [];
     private _status: PromiseStatus;
     private _value: any;
+    private _id: number;
     private _onFulfilledActions: FulfilledAction[];
     private _onFailedActions: FailedAction[];
 
     constructor(executor?: (resolve:(result?)=>void, reject:(reason?)=>void)=>void){
+        Promise._promiseArr.push(this);
+        this._id = Promise._promiseArr.length;
+
         this._status = PromiseStatus.PENDING;
         this._value = undefined;
         this._onFulfilledActions = [];
