@@ -30,8 +30,10 @@ describe("1. Basic Test", ()=>{
         let promise = new Promise((resolve, reject)=>{
             process.nextTick(()=>{
                 resolve();
-                expect(promise.status).toEqual(PromiseStatus.RESOLVED);
-                done();
+                process.nextTick(()=>{
+                    expect(promise.status).toEqual(PromiseStatus.RESOLVED);
+                    done();
+                });
             });
         });
         expect(promise.status).toEqual(PromiseStatus.PENDING);
@@ -41,8 +43,10 @@ describe("1. Basic Test", ()=>{
         let promise = new Promise((resolve, reject)=>{
             process.nextTick(()=>{
                 reject();
-                expect(promise.status).toEqual(PromiseStatus.REJECTED);
-                done();
+                process.nextTick(()=>{
+                    expect(promise.status).toEqual(PromiseStatus.REJECTED);
+                    done();
+                });
             });
         });
         expect(promise.status).toEqual(PromiseStatus.PENDING);
@@ -53,8 +57,10 @@ describe("1. Basic Test", ()=>{
             process.nextTick(()=>{
                 reject();
                 resolve();
-                expect(promise.status).toEqual(PromiseStatus.REJECTED);
-                done();
+                delayAfterTicks(2, ()=>{
+                    expect(promise.status).toEqual(PromiseStatus.REJECTED);
+                    done();
+                });
             });
         });
     });
@@ -64,8 +70,10 @@ describe("1. Basic Test", ()=>{
             process.nextTick(()=>{
                 resolve();
                 reject();
-                expect(promise.status).toEqual(PromiseStatus.RESOLVED);
-                done();
+                delayAfterTicks(2, ()=>{
+                    expect(promise.status).toEqual(PromiseStatus.RESOLVED);
+                    done();
+                });
             });
         });
     });
@@ -100,7 +108,9 @@ describe("The Then Method", ()=>{
         promise1.then(helpFunc("C"));
 
         // also check if the result pass to then method
-        expect(executedOrder).toBe("A1B1C1");
+        delayAfterTicks(2, ()=>{
+            expect(executedOrder).toBe("A1B1C1");
+        });
     });
 
     it("[Async] If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their originating calls to then", ()=>{
@@ -120,7 +130,7 @@ describe("The Then Method", ()=>{
         promise1.then(helpFunc("C"));
 
         // also check if the result pass to then method
-        process.nextTick(()=>{
+        delayAfterTicks(2, ()=>{
             expect(executedOrder).toBe("A1B1C1");
         });
     });
@@ -141,7 +151,9 @@ describe("The Then Method", ()=>{
         promise1.then(undefined, helpFunc("C"));
 
         // also check if the result pass to then method
-        expect(executedOrder).toBe("A1B1C1");
+        delayAfterTicks(2, ()=>{
+            expect(executedOrder).toBe("A1B1C1");
+        });
     });
 
     it("[Async] If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.", ()=>{
@@ -161,7 +173,7 @@ describe("The Then Method", ()=>{
         promise1.then(undefined, helpFunc("C"));
 
         // also check if the result pass to then method
-        process.nextTick(()=>{
+        delayAfterTicks(2, ()=>{
             expect(executedOrder).toBe("A1B1C1");
         });
     });
@@ -222,9 +234,9 @@ describe("The Then Method", ()=>{
         });
 
         // because try catch, the assert of jest will be blocked, so I check result at next tick
-        process.nextTick(()=>{
+        delayAfterTicks(3, ()=>{
             expect(tmpReason.toString()).toBe("Error: GG");
-        })
+        });
     });
     it("[Async] If onFulfilled throws an exception e, next promise must be rejected with e as the reason.", ()=>{
         let tmpReason;
@@ -239,9 +251,9 @@ describe("The Then Method", ()=>{
         });
 
         // because try catch, the assert of jest will be blocked, so I check result at next tick
-        process.nextTick(()=>{
+       delayAfterTicks(4, ()=>{
             expect(tmpReason.toString()).toBe("Error: GG");
-        })
+        });
     });
 
     it("If onFailed throws an exception e, next promise must be rejected with e as the reason.", ()=>{
@@ -255,9 +267,9 @@ describe("The Then Method", ()=>{
         });
 
         // because try catch, the assert of jest will be blocked, so I check result at next tick
-        process.nextTick(()=>{
+        delayAfterTicks(3, ()=>{
             expect(tmpReason.toString()).toBe("Error: GG");
-        })
+        });
     });
     it("[Async] If onFailed throws an exception e, next promise must be rejected with e as the reason.", ()=>{
         let tmpReason;
@@ -272,7 +284,7 @@ describe("The Then Method", ()=>{
         });
 
         // because try catch, the assert of jest will be blocked, so I check result at next tick
-        process.nextTick(()=>{
+        delayAfterTicks(4, ()=>{
             expect(tmpReason.toString()).toBe("Error: GG");
         })
     });
@@ -287,7 +299,7 @@ describe("The Then Method", ()=>{
                 tmpResult = result;
             });
 
-        process.nextTick(()=>{
+        delayAfterTicks(4, ()=>{
             expect(tmpResult).toBe(1);
         });
     });
@@ -302,7 +314,7 @@ describe("The Then Method", ()=>{
                 tmpResult = result;
             });
 
-        process.nextTick(()=>{
+        delayAfterTicks(4, ()=>{
             expect(tmpResult).toBe(1);
         });
     });
@@ -317,7 +329,7 @@ describe("The Then Method", ()=>{
                 tmpReason = reason;
             });
 
-        process.nextTick(()=>{
+        delayAfterTicks(3,()=>{
             expect(tmpReason).toBe(1);
         });
     });
@@ -332,8 +344,8 @@ describe("The Then Method", ()=>{
                 tmpReason = reason;
             });
 
-        process.nextTick(()=>{
-            expect(tmpReason).toBe(1);
+        delayAfterTicks(4, ()=> {
+                expect(tmpReason).toBe(1);
         });
     });
 });
