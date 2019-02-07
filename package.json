@@ -1,0 +1,28 @@
+{
+  "name": "promiseByTsInTdd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watch",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zonetw/promiseByTsInTdd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zonetw/promiseByTsInTdd/issues"
+  },
+  "homepage": "https://github.com/zonetw/promiseByTsInTdd#readme",
+  "devDependencies": {
+    "@types/jest": "^23.3.13",
+    "@types/node": "^10.12.21",
+    "jest": "^24.0.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.3.1"
+  }
+}
