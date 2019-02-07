@@ -1,6 +1,19 @@
 import {PromiseStatus} from "../src/PromiseStatus";
 import {Promise} from "../src/Promise";
 
+const delayAfterTicks = (times: number, func: Function)=>{
+    let currentCounter: number = 0;
+    const check = ()=>{
+        if(currentCounter++<times){
+            process.nextTick(check);
+        }else{
+            func();
+        }
+    };
+
+    check();
+};
+
 describe("1. Basic Test", ()=>{
     it("Promise have a status of pending at the beginning", ()=>{
         let promise = new Promise((resolve, reject)=>{
